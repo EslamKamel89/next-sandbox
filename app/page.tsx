@@ -1,12 +1,12 @@
-"use client";
+import CustomButton from "@/components/CustomButton";
+
 export default function Home() {
-  const handleClick = () => {
-    console.log("Clicked");
-  };
+  const secret = process.env.SECRET;
+  console.log(secret);
   return (
     <div>
       <main>hello from the server</main>
-      <button onClick={handleClick}>Click Me!!!</button>
+      <CustomButton />
     </div>
   );
 }
