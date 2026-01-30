@@ -1,8 +1,10 @@
+import { sleep } from "@/app/page";
 import express from "express";
 const app = express();
 const PORT = 4000;
 
-app.get("/timestamp", (req, res) => {
+app.get("/timestamp", async (req, res) => {
+  await sleep(3);
   return res.json({
     timestamp: Date.now(),
     iso: new Date().toISOString(),
