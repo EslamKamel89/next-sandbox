@@ -1,4 +1,7 @@
+import Posts, { PostsFallback } from "@/components/Posts";
+import ServerTime, { ServerTimeFallback } from "@/components/ServerTime";
 import Link from "next/link";
+import { Suspense } from "react";
 export interface Timestamp {
   timestamp: number;
   iso: string;
@@ -32,24 +35,7 @@ export const sleep = async (seconds: number) => {
   });
 };
 
-const fetchPosts = async () => {
-  await sleep(3);
-  const res = await fetch("https://dummyjson.com/posts");
-  if (!res.ok) throw new Error("Sorry something went wrong");
-  const posts: PostsResponse = await res.json();
-  return posts;
-};
-const fetchLocalTime = async () => {
-  const res = await fetch("http://localhost:4000/timestamp", {
-    next: { revalidate: 30 },
-  });
-  if (!res.ok) throw new Error("Sorry something went wrong");
-  const timestamp: Timestamp = await res.json();
-  return timestamp;
-};
 const Home = async () => {
-  const posts = await fetchPosts();
-  const timestamp = await fetchLocalTime();
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-14">
       <div className="max-w-4xl mx-auto px-6">
@@ -64,53 +50,12 @@ const Home = async () => {
             Blog
           </Link>
         </div>
-
-        <div className="mb-8 inline-flex items-center gap-2 bg-white/70 backdrop-blur px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-600 shadow-sm">
-          <span className="font-medium text-gray-800">Server Time:</span>
-          <span className="font-mono text-gray-900">{timestamp.timestamp}</span>
-        </div>
-
-        <div className="space-y-8">
-          {posts.posts.map((article) => (
-            <div
-              key={article.id}
-              className="group bg-white p-7 rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
-            >
-              <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-3 group-hover:text-gray-700 transition-colors">
-                {article.title}
-              </h2>
-
-              <p className="text-gray-600 leading-relaxed text-[15px]">
-                {article.body}
-              </p>
-
-              <div className="mt-5 flex flex-wrap gap-2 text-xs">
-                {article.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-2.5 py-1 rounded-full bg-gray-100 text-gray-600 border border-gray-200"
-                  >
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-
-              <div className="mt-6 flex items-center justify-between text-sm text-gray-500">
-                <div className="flex items-center gap-4">
-                  <span className="flex items-center gap-1">
-                    👍 {article.reactions.likes}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    👎 {article.reactions.dislikes}
-                  </span>
-                </div>
-                <span className="font-medium text-gray-600">
-                  {article.views} views
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
+        <Suspense fallback={ServerTimeFallback()}>
+          <ServerTime />
+        </Suspense>
+        <Suspense fallback={PostsFallback()}>
+          <Posts />
+        </Suspense>
       </div>
     </div>
   );
