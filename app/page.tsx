@@ -26,13 +26,14 @@ export interface Reactions {
   dislikes: number;
 }
 
-const sleep = async (seconds: number) => {
+export const sleep = async (seconds: number) => {
   await new Promise((resolve) => {
     setTimeout(resolve, seconds * 1000);
   });
 };
 
 const fetchPosts = async () => {
+  await sleep(3);
   const res = await fetch("https://dummyjson.com/posts");
   if (!res.ok) throw new Error("Sorry something went wrong");
   const posts: PostsResponse = await res.json();
